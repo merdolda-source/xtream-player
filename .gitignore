@@ -1,0 +1,60 @@
+# iOS
+iOS/Pods/
+iOS/*.xcworkspace
+iOS/build/
+iOS/.DS_Store
+iOS/**/.DS_Store
+iOS/*.xcarchive
+iOS/DerivedData/
+iOS/*.xcarchive/
+iOS/fastlane/report.xml
+iOS/fastlane/.screenshots
+iOS/fastlane/Preview.html
+iOS/fastlane/screenshots
+iOS/build/
+iOS/.swiftformat
+
+# Android
+Android/build/
+Android/.gradle/
+Android/.idea/
+Android/local.properties
+Android/**/.DS_Store
+Android/**/*.apk
+Android/**/*.aab
+Android/**/build/
+Android/.DS_Store
+Android/*.jks
+Android/*.keystore
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+*.log
+.env
+.env.local
+.vscode
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+
+# Xcode
+xcuserdata/
+.xcodeproj/xcuserdata/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Node (if used for tools)
+node_modules/
+npm-debug.log
+yarn-error.log

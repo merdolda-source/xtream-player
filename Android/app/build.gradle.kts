@@ -73,6 +73,14 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        // Room 2.5.2's bundled kotlinx-metadata-jvm reader can choke on the
+        // newest Kotlin 1.9 metadata encoding when run through kapt, causing
+        // it to lose track of which DAO functions are `suspend` (it then
+        // treats the Continuation param as a regular query param). Capping
+        // the emitted metadata/language level at 1.8 keeps it in a format
+        // every consumer here can parse, without changing any source code.
+        languageVersion = "1.8"
+        apiVersion = "1.8"
     }
 
     buildFeatures {
@@ -164,4 +172,17 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
+}
+
+// room-compiler 2.5.2 pulls in kotlinx-metadata-jvm 0.5.0, which cannot parse
+// the Kotlin metadata format emitted by the Kotlin 1.9.0 compiler (mv=1.9.0).
+// Without this, Room's kapt processor silently fails to recognize suspend
+// DAO functions (it sees a raw Continuation parameter instead of awaiting a
+// suspend fun) and emits "Not sure how to handle ... return type" errors.
+// Forcing a newer kotlinx-metadata-jvm that understands 1.9 metadata fixes
+// suspend-fun recognition for Room without changing any DAO/entity code.
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.6.0")
+    }
 }

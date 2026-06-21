@@ -73,7 +73,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadTab(tab: HomeTab) {
-        val session = _uiState.value
         viewModelScope.launch {
             val user = authRepository.getCurrentSession()
             if (user == null) {

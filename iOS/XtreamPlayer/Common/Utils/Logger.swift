@@ -5,7 +5,7 @@ import os.log
 class Logger {
     static var isEnabled = true
     private static let subsystem = "com.xtream.player"
-    private static let osLog = os.Log(subsystem: subsystem, category: "general")
+    private static let osLog = OSLog(subsystem: subsystem, category: "general")
     private static var fileHandle: FileHandle?
     
     static func setup() {

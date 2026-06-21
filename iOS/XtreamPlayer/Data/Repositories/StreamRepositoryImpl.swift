@@ -18,18 +18,21 @@ final class StreamRepositoryImpl: StreamRepository {
 
     func getLiveStreams(host: String, username: String, password: String, categoryId: String?) async throws -> [Stream] {
         let streams = try await apiClient.getLiveStreams(host: host, username: username, password: password, categoryId: categoryId)
+            .map { tagged($0, as: .live) }
         cache(streams)
         return streams
     }
 
     func getVODStreams(host: String, username: String, password: String, categoryId: String?) async throws -> [Stream] {
         let streams = try await apiClient.getVODStreams(host: host, username: username, password: password, categoryId: categoryId)
+            .map { tagged($0, as: .vod) }
         cache(streams)
         return streams
     }
 
     func getSeries(host: String, username: String, password: String, categoryId: String?) async throws -> [Stream] {
         let streams = try await apiClient.getSeries(host: host, username: username, password: password, categoryId: categoryId)
+            .map { tagged($0, as: .series) }
         cache(streams)
         return streams
     }
@@ -57,6 +60,12 @@ final class StreamRepositoryImpl: StreamRepository {
     }
 
     // MARK: - Private
+
+    private func tagged(_ stream: Stream, as type: StreamType) -> Stream {
+        var stream = stream
+        stream.type = type
+        return stream
+    }
 
     private func cache(_ streams: [Stream]) {
         for stream in streams {

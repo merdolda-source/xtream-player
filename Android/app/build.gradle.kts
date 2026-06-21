@@ -3,8 +3,6 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -22,11 +20,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        // Sourced into AndroidManifest.xml's AdMob APPLICATION_ID meta-data tag.
-        // Mirrors the per-buildtype BuildConfig.ADMOB_APP_ID value below.
-        // TODO: replace with the real AdMob app id before release.
-        manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
     }
 
     // Signing Configuration for Release APK
@@ -51,17 +44,12 @@ android {
             }
 
             buildConfigField("String", "API_BASE_URL", "\"https://xtream-player.com/api/\"")
-            // TODO: replace with the real AdMob app id before release. Using Google's
-            // public test app id keeps debug/release builds runnable without crashing.
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "false")
         }
 
         debug {
             isDebuggable = true
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
-            // Google's official public test AdMob app id - safe for non-production builds.
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
         }
     }
@@ -145,13 +133,6 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.1.0")
     implementation("androidx.media3:media3-ui:1.1.0")
     implementation("androidx.media3:media3-session:1.1.0")
-
-    // Firebase
-    implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
-
-    // Google Mobile Ads
-    implementation("com.google.android.gms:play-services-ads:22.6.0")
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")

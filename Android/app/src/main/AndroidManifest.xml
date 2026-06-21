@@ -15,18 +15,6 @@
         android:theme="@style/Theme.XtreamPlayer"
         android:usesCleartextTraffic="true">
 
-        <!--
-            AdMob application id. Sourced from the manifestPlaceholders["admobAppId"]
-            entry in app/build.gradle.kts (currently Google's official PUBLIC TEST id
-            ca-app-pub-3940256099942544~3347511713).
-            TODO: MUST be replaced with a real AdMob app id before release - the test
-            id is safe to ship in debug but will not serve real ads / will violate
-            AdMob policy in production.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${admobAppId}" />
-
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

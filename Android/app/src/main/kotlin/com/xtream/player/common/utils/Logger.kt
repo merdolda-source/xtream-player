@@ -3,6 +3,7 @@ package com.xtream.player.common.utils
 
 import android.content.Context
 import android.util.Log
+import com.xtream.player.BuildConfig
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date

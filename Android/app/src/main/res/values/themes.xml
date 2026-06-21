@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android/app/src/main/res/values/themes.xml -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. Compose draws the UI; this theme mainly governs
+         the window background / status bar before Compose content is set, and
+         is required for any non-Compose system surfaces (e.g. launcher). -->
+    <style name="Theme.XtreamPlayer" parent="android:Theme.Material.NoActionBar">
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/background_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+    </style>
+</resources>

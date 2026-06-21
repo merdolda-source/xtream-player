@@ -1,0 +1,30 @@
+{
+  "_comment": "TODO: PLACEHOLDER FILE - replace with the real google-services.json downloaded from the Firebase console for the actual Firebase project before shipping. This dummy file only exists so the google-services / crashlytics Gradle plugins do not fail project configuration during development builds.",
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "xtream-player-placeholder",
+    "storage_bucket": "xtream-player-placeholder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "com.xtream.player"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUMMY00000000000000000000000000000"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

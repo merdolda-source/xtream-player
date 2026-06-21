@@ -22,6 +22,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Sourced into AndroidManifest.xml's AdMob APPLICATION_ID meta-data tag.
+        // Mirrors the per-buildtype BuildConfig.ADMOB_APP_ID value below.
+        // TODO: replace with the real AdMob app id before release.
+        manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
     }
 
     // Signing Configuration for Release APK
@@ -46,14 +51,17 @@ android {
             }
 
             buildConfigField("String", "API_BASE_URL", "\"https://xtream-player.com/api/\"")
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy\"")
+            // TODO: replace with the real AdMob app id before release. Using Google's
+            // public test app id keeps debug/release builds runnable without crashing.
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "false")
         }
 
         debug {
             isDebuggable = true
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy\"")
+            // Google's official public test AdMob app id - safe for non-production builds.
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
         }
     }

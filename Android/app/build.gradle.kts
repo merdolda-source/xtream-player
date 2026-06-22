@@ -103,6 +103,12 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.0")
 
+    // Material Icons (extended set: PlayCircle, Subtitles, Favorite, History, etc.)
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+
+    // Image loading for stream/series posters and episode thumbnails
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
@@ -129,8 +135,11 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // Media3/ExoPlayer
+    // Media3/ExoPlayer - hls/dash extras widen format support beyond plain
+    // progressive mp4/mkv (Xtream live channels are commonly HLS or DASH).
     implementation("androidx.media3:media3-exoplayer:1.1.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.1.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.1.0")
     implementation("androidx.media3:media3-ui:1.1.0")
     implementation("androidx.media3:media3-session:1.1.0")
 

@@ -21,4 +21,17 @@ object NavRoutes {
         val ext = containerExt ?: "none"
         return "$PLAYER/$streamId/$streamType/$encodedName/$ext"
     }
+
+    const val SERIES_DETAIL = "seriesDetail"
+    const val SERIES_DETAIL_ARG_ID = "seriesId"
+    const val SERIES_DETAIL_ARG_NAME = "seriesName"
+    const val SERIES_DETAIL_ARG_COVER = "seriesCover"
+    const val SERIES_DETAIL_ROUTE =
+        "$SERIES_DETAIL/{$SERIES_DETAIL_ARG_ID}/{$SERIES_DETAIL_ARG_NAME}/{$SERIES_DETAIL_ARG_COVER}"
+
+    fun seriesDetailRoute(seriesId: String, name: String, cover: String?): String {
+        val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
+        val encodedCover = java.net.URLEncoder.encode(cover ?: "none", "UTF-8")
+        return "$SERIES_DETAIL/$seriesId/$encodedName/$encodedCover"
+    }
 }

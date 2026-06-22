@@ -10,6 +10,7 @@ import com.xtream.player.data.remote.api.XtreamApiService
 import com.xtream.player.data.remote.api.XtreamUrlBuilder
 import com.xtream.player.data.remote.dto.toDomain
 import com.xtream.player.data.session.SessionManager
+import com.xtream.player.domain.entities.SeriesDetails
 import com.xtream.player.domain.entities.Stream
 import com.xtream.player.domain.entities.StreamType
 import com.xtream.player.domain.repositories.StreamRepository
@@ -61,6 +62,19 @@ class StreamRepositoryImpl @Inject constructor(
         val url = XtreamUrlBuilder.playerApiUrl(host)
         return apiService.getSeries(url, username, password, categoryId = categoryId)
             .map { it.toDomain() }
+    }
+
+    override suspend fun getSeriesInfo(
+        host: String,
+        username: String,
+        password: String,
+        seriesId: String,
+        fallbackName: String,
+        fallbackCover: String?
+    ): SeriesDetails {
+        val url = XtreamUrlBuilder.playerApiUrl(host)
+        return apiService.getSeriesInfo(url, username, password, seriesId = seriesId)
+            .toDomain(seriesId, fallbackName, fallbackCover)
     }
 
     override suspend fun searchStreams(query: String): List<Stream> {

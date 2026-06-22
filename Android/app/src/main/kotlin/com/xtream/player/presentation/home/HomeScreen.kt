@@ -1,23 +1,30 @@
 // Android/app/src/main/kotlin/com/xtream/player/presentation/home/HomeScreen.kt
 package com.xtream.player.presentation.home
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.xtream.player.R
 import com.xtream.player.domain.entities.Stream
+import com.xtream.player.presentation.common.StreamLogoRow
+import com.xtream.player.presentation.common.StreamPosterCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,19 +57,19 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text(stringRes(R.string.app_name)) },
                 actions = {
-                    TextButton(onClick = onNavigateToFavorites) {
-                        Text(stringRes(R.string.favorites_title))
+                    IconButton(onClick = onNavigateToFavorites) {
+                        Icon(Icons.Filled.Favorite, contentDescription = stringRes(R.string.favorites_title))
                     }
-                    TextButton(onClick = onNavigateToHistory) {
-                        Text(stringRes(R.string.history_title))
+                    IconButton(onClick = onNavigateToHistory) {
+                        Icon(Icons.Filled.History, contentDescription = stringRes(R.string.history_title))
                     }
-                    TextButton(onClick = {
+                    IconButton(onClick = {
                         coroutineScope.launch {
                             viewModel.logout()
                             onLoggedOut()
                         }
                     }) {
-                        Text(stringRes(R.string.action_logout))
+                        Icon(Icons.Filled.Logout, contentDescription = stringRes(R.string.action_logout))
                     }
                 }
             )
@@ -97,7 +106,11 @@ fun HomeScreen(
                             HomeTab.VOD -> uiState.vodStreams
                             HomeTab.SERIES -> uiState.seriesStreams
                         }
-                        StreamList(streams = streams, onStreamClick = onStreamClick)
+                        if (uiState.selectedTab == HomeTab.LIVE) {
+                            StreamListView(streams = streams, onStreamClick = onStreamClick)
+                        } else {
+                            StreamGridView(streams = streams, onStreamClick = onStreamClick)
+                        }
                     }
                 }
             }
@@ -106,23 +119,40 @@ fun HomeScreen(
 }
 
 @Composable
-private fun StreamList(streams: List<Stream>, onStreamClick: (Stream) -> Unit) {
+private fun StreamListView(streams: List<Stream>, onStreamClick: (Stream) -> Unit) {
     if (streams.isEmpty()) {
-        Text(
-            text = stringRes(R.string.empty_list),
-            modifier = Modifier.padding(16.dp)
-        )
+        Text(text = stringRes(R.string.empty_list), modifier = Modifier.padding(16.dp))
         return
     }
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(12.dp)
+    ) {
         items(streams, key = { it.streamId }) { stream ->
-            ListItem(
-                headlineContent = { Text(stream.name) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onStreamClick(stream) }
+            StreamLogoRow(
+                stream = stream,
+                onClick = { onStreamClick(stream) },
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            Divider()
+        }
+    }
+}
+
+@Composable
+private fun StreamGridView(streams: List<Stream>, onStreamClick: (Stream) -> Unit) {
+    if (streams.isEmpty()) {
+        Text(text = stringRes(R.string.empty_list), modifier = Modifier.padding(16.dp))
+        return
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(streams, key = { it.streamId }) { stream ->
+            StreamPosterCard(stream = stream, onClick = { onStreamClick(stream) })
         }
     }
 }

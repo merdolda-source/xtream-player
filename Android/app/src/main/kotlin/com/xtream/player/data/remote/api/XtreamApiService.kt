@@ -4,6 +4,7 @@ package com.xtream.player.data.remote.api
 import com.xtream.player.data.remote.dto.CategoryDto
 import com.xtream.player.data.remote.dto.LoginResponseDto
 import com.xtream.player.data.remote.dto.SeriesDto
+import com.xtream.player.data.remote.dto.SeriesInfoResponseDto
 import com.xtream.player.data.remote.dto.StreamDto
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -78,4 +79,14 @@ interface XtreamApiService {
         @Query("action") action: String = "get_series",
         @Query("category_id") categoryId: String? = null
     ): List<SeriesDto>
+
+    /** Resolves the season/episode breakdown for a single series entry. */
+    @GET
+    suspend fun getSeriesInfo(
+        @Url url: String,
+        @Query("username") username: String,
+        @Query("password") password: String,
+        @Query("action") action: String = "get_series_info",
+        @Query("series_id") seriesId: String
+    ): SeriesInfoResponseDto
 }

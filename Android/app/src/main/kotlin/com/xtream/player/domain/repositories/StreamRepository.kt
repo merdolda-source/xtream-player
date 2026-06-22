@@ -1,6 +1,7 @@
 // Android/app/src/main/kotlin/com/xtream/player/domain/repositories/StreamRepository.kt
 package com.xtream.player.domain.repositories
 
+import com.xtream.player.domain.entities.SeriesDetails
 import com.xtream.player.domain.entities.Stream
 
 interface StreamRepository {
@@ -24,7 +25,16 @@ interface StreamRepository {
         password: String,
         categoryId: String? = null
     ): List<Stream>
-    
+
+    suspend fun getSeriesInfo(
+        host: String,
+        username: String,
+        password: String,
+        seriesId: String,
+        fallbackName: String,
+        fallbackCover: String?
+    ): SeriesDetails
+
     suspend fun searchStreams(query: String): List<Stream>
     
     suspend fun getFavorites(): List<Stream>

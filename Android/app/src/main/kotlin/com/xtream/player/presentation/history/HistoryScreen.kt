@@ -1,18 +1,20 @@
 // Android/app/src/main/kotlin/com/xtream/player/presentation/history/HistoryScreen.kt
 package com.xtream.player.presentation.history
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.xtream.player.R
 import com.xtream.player.domain.entities.Stream
+import com.xtream.player.presentation.common.StreamPosterCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +43,7 @@ fun HistoryScreen(
             TopAppBar(
                 title = { Text(stringRes(R.string.history_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Text("<") }
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = null) }
                 }
             )
         }
@@ -57,15 +60,15 @@ fun HistoryScreen(
                     )
                 }
                 else -> {
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         items(uiState.history, key = { it.streamId }) { stream ->
-                            ListItem(
-                                headlineContent = { Text(stream.name) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onStreamClick(stream) }
-                            )
-                            Divider()
+                            StreamPosterCard(stream = stream, onClick = { onStreamClick(stream) })
                         }
                     }
                 }

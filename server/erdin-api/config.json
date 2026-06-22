@@ -1,0 +1,8 @@
+{
+    "ads": {
+        "admob_banner_id": "ca-app-pub-3940256099942544/6300978111",
+        "admob_interstitial_id": "ca-app-pub-3940256099942544/1033173712",
+        "channel_interval": 4,
+        "banner_interval": 7
+    }
+}

@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,6 +56,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import android.app.Activity
+import android.content.Intent
+import androidx.core.content.FileProvider
+import xtream.emin.player.common.utils.Logger
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -85,6 +89,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     BackHandler(enabled = uiState.viewMode == HomeViewMode.STREAMS) {
         viewModel.backToCategories()
@@ -114,6 +119,9 @@ fun HomeScreen(
                 actions = {
                     ThemeSwitcher()
                     LanguageSwitcher()
+                    IconButton(onClick = { shareLogs(context) }) {
+                        Icon(Icons.Filled.BugReport, contentDescription = stringRes(R.string.action_share_logs))
+                    }
                     IconButton(onClick = onNavigateToFavorites) {
                         Icon(Icons.Filled.Favorite, contentDescription = stringRes(R.string.favorites_title))
                     }
@@ -401,6 +409,17 @@ private fun setAppLocale(context: android.content.Context, languageTag: String) 
     LocaleHelper.setLanguageTag(context, languageTag)
     AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
     (context as? Activity)?.recreate()
+}
+
+private fun shareLogs(context: android.content.Context) {
+    val logFile = Logger.exportLogs() ?: return
+    val uri = FileProvider.getUriForFile(context, "xtream.emin.player.fileprovider", logFile)
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(intent, null))
 }
 
 @Composable

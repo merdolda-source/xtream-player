@@ -60,13 +60,15 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
 
-            // Real AdMob IDs, same as release - requested explicitly after
-            // verifying the integration against Google's test ad units.
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-2289573527937577~5012458331"
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-2289573527937577~5012458331\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/1957336650\"")
-            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/5777428099\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/3851092581\"")
+            // Google's published sample/test AdMob IDs - these always have
+            // fill and never count as real impressions, so repeated local
+            // testing from this device can't get flagged as invalid traffic
+            // against the real ad units (which only ship in release builds).
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
         }
     }
 

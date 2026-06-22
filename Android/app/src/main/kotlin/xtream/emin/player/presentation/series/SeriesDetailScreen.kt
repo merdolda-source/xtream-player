@@ -38,10 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import xtream.emin.player.R
 import xtream.emin.player.domain.entities.Episode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +108,7 @@ fun SeriesDetailScreen(
 
                         if (uiState.episodes.isEmpty()) {
                             Text(
-                                text = "Bu sezon için bölüm bulunamadı.",
+                                text = stringResource(R.string.series_no_episodes),
                                 modifier = Modifier.padding(16.dp)
                             )
                         } else {
@@ -217,7 +219,7 @@ private fun EpisodeRow(episode: Episode, onClick: () -> Unit) {
                 )
                 episode.durationSecs?.let { secs ->
                     Text(
-                        text = "${secs / 60} dk",
+                        text = stringResource(R.string.player_minutes_suffix).format(secs / 60),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

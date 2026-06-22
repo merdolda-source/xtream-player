@@ -48,7 +48,7 @@ private fun EpisodeDto.toDomain(fallbackSeason: Int): Episode? {
     return Episode(
         episodeId = episodeId,
         episodeNum = num,
-        title = title?.takeUnless { it.isBlank() } ?: "Bölüm $num",
+        title = title?.takeUnless { it.isBlank() } ?: "Episode $num",
         season = season ?: fallbackSeason,
         containerExtension = containerExtension,
         plot = info?.plot,
@@ -76,7 +76,7 @@ fun SeriesInfoResponseDto.toDomain(seriesId: String, fallbackName: String, fallb
             val num = dto.seasonNumber ?: return@mapNotNull null
             Season(
                 seasonNumber = num,
-                name = dto.name?.takeUnless { it.isBlank() } ?: "Sezon $num",
+                name = dto.name?.takeUnless { it.isBlank() } ?: "Season $num",
                 cover = dto.cover,
                 episodeCount = dto.episodeCount ?: episodesBySeason[num]?.size ?: 0
             )
@@ -84,7 +84,7 @@ fun SeriesInfoResponseDto.toDomain(seriesId: String, fallbackName: String, fallb
 
     val resolvedSeasons = (declaredSeasons.ifEmpty {
         episodesBySeason.keys.map { num ->
-            Season(seasonNumber = num, name = "Sezon $num", episodeCount = episodesBySeason[num]?.size ?: 0)
+            Season(seasonNumber = num, name = "Season $num", episodeCount = episodesBySeason[num]?.size ?: 0)
         }
     }).sortedBy { it.seasonNumber }
 

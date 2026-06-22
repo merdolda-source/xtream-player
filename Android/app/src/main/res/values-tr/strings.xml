@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android/app/src/main/res/values-tr/strings.xml -->
+<resources>
+    <string name="app_name">Xtream Player</string>
+
+    <string name="login_title">Xtream\'e Giriş Yap</string>
+    <string name="login_host_label">Sunucu adresi (örn. http://example.com:8080)</string>
+    <string name="login_username_label">Kullanıcı Adı</string>
+    <string name="login_password_label">Şifre</string>
+    <string name="login_button">Giriş Yap</string>
+    <string name="login_error_generic">Giriş başarısız. Bilgilerinizi kontrol edip tekrar deneyin.</string>
+    <string name="login_error_empty_fields">Lütfen tüm alanları doldurun.</string>
+
+    <string name="tab_live">Canlı TV</string>
+    <string name="tab_vod">Filmler</string>
+    <string name="tab_series">Diziler</string>
+
+    <string name="category_all">Tümü</string>
+
+    <string name="favorites_title">Favoriler</string>
+    <string name="favorites_empty">Henüz favori yok.</string>
+
+    <string name="history_title">İzleme Geçmişi</string>
+    <string name="history_empty">Henüz izleme geçmişi yok.</string>
+
+    <string name="action_search">Ara</string>
+    <string name="action_logout">Çıkış Yap</string>
+    <string name="action_favorite_add">Favorilere ekle</string>
+    <string name="action_favorite_remove">Favorilerden çıkar</string>
+
+    <string name="player_error">Oynatma hatası. Lütfen tekrar deneyin.</string>
+    <string name="loading">Yükleniyor…</string>
+    <string name="empty_list">Burada gösterilecek bir şey yok.</string>
+
+    <string name="player_settings_title">Oynatıcı Ayarları</string>
+    <string name="player_settings_content_description">Ses, altyazı ve hız</string>
+    <string name="player_speed_label">Hız</string>
+    <string name="player_audio_label">Ses</string>
+    <string name="player_subtitles_label">Altyazı</string>
+    <string name="player_subtitles_off">Kapalı</string>
+    <string name="player_close">Kapat</string>
+    <string name="player_track_fallback">Parça %1$d</string>
+    <string name="player_zoom_fit">Sığdır</string>
+    <string name="player_zoom_fill">Doldur</string>
+    <string name="player_zoom_zoom">Yakınlaştır</string>
+    <string name="player_minutes_suffix">%1$d dk</string>
+
+    <string name="series_no_episodes">Bu sezon için bölüm bulunamadı.</string>
+
+    <string name="action_language">Dili değiştir</string>
+    <string name="language_title">Dil</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_english">English</string>
+</resources>

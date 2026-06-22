@@ -92,11 +92,16 @@ fun XtreamNavHost(navController: NavHostController, startDestination: String) {
                 seriesName = name,
                 seriesCover = cover,
                 onEpisodeClick = { episode ->
+                    // Some Xtream panels echo the series name back as a
+                    // placeholder episode title, which would otherwise show
+                    // up twice (e.g. "After Life - S1E1 - After Life").
+                    val episodeLabel = "S${episode.season}E${episode.episodeNum}" +
+                        if (episode.title.isNotBlank() && episode.title != name) " - ${episode.title}" else ""
                     navController.navigate(
                         NavRoutes.playerRoute(
                             streamId = episode.episodeId,
                             streamType = StreamType.SERIES.name,
-                            name = "$name - S${episode.season}E${episode.episodeNum} - ${episode.title}",
+                            name = "$name - $episodeLabel",
                             containerExt = episode.containerExtension
                         )
                     )

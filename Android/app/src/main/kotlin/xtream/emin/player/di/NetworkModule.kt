@@ -1,8 +1,11 @@
 // Android/app/src/main/kotlin/com/xtream/player/di/NetworkModule.kt
 package xtream.emin.player.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import xtream.emin.player.BuildConfig
 import xtream.emin.player.data.remote.api.XtreamApiService
+import xtream.emin.player.data.remote.gson.LenientObjectTypeAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,14 +44,21 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+    fun provideGson(): Gson =
+        GsonBuilder()
+            .registerTypeAdapterFactory(LenientObjectTypeAdapterFactory)
+            .create()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit =
         Retrofit.Builder()
             // Xtream servers are user-supplied at login time; the real
             // request URL is always passed explicitly via @Url, so this
             // base URL is a non-functional placeholder Retrofit requires.
             .baseUrl(BuildConfig.API_BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
     @Provides

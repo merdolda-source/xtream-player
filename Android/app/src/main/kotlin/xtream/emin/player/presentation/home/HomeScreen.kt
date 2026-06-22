@@ -14,11 +14,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -31,10 +35,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import xtream.emin.player.R
 import xtream.emin.player.domain.entities.Category
@@ -60,6 +68,7 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text(stringRes(R.string.app_name)) },
                 actions = {
+                    LanguageSwitcher()
                     IconButton(onClick = onNavigateToFavorites) {
                         Icon(Icons.Filled.Favorite, contentDescription = stringRes(R.string.favorites_title))
                     }
@@ -222,6 +231,36 @@ private fun StreamGridView(
             )
         }
     }
+}
+
+@Composable
+private fun LanguageSwitcher() {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Filled.Language, contentDescription = stringRes(R.string.action_language))
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringRes(R.string.language_turkish)) },
+                onClick = {
+                    expanded = false
+                    setAppLocale("tr")
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringRes(R.string.language_english)) },
+                onClick = {
+                    expanded = false
+                    setAppLocale("en")
+                }
+            )
+        }
+    }
+}
+
+private fun setAppLocale(languageTag: String) {
+    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
 }
 
 @Composable

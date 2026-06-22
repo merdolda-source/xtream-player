@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
@@ -58,7 +59,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.delay
+import xtream.emin.player.R
 import xtream.emin.player.domain.entities.StreamType
+import java.util.Locale
 
 private data class TrackOption(
     val group: Tracks.Group,
@@ -67,10 +70,37 @@ private data class TrackOption(
     val isSelected: Boolean
 )
 
-private enum class ZoomMode(val resizeMode: Int, val label: String) {
-    FIT(AspectRatioFrameLayout.RESIZE_MODE_FIT, "Sığdır"),
-    FILL(AspectRatioFrameLayout.RESIZE_MODE_FILL, "Doldur"),
-    ZOOM(AspectRatioFrameLayout.RESIZE_MODE_ZOOM, "Yakınlaştır")
+private enum class ZoomMode(val resizeMode: Int, val labelRes: Int) {
+    FIT(AspectRatioFrameLayout.RESIZE_MODE_FIT, R.string.player_zoom_fit),
+    FILL(AspectRatioFrameLayout.RESIZE_MODE_FILL, R.string.player_zoom_fill),
+    ZOOM(AspectRatioFrameLayout.RESIZE_MODE_ZOOM, R.string.player_zoom_zoom)
+}
+
+/**
+ * Some Xtream panels brand raw HLS/manifest track labels with the
+ * provider's own site name (e.g. "MyIptvSite.com") instead of a real
+ * language name, which is confusing to show as an audio/subtitle option.
+ */
+private fun isLikelyBrandedLabel(label: String): Boolean =
+    label.contains("http", ignoreCase = true) ||
+        label.contains("www.", ignoreCase = true) ||
+        Regex("\\.[a-zA-Z]{2,6}(?:/|$)").containsMatchIn(label)
+
+private fun cleanTrackLabel(
+    language: String?,
+    rawLabel: String?,
+    fallback: String
+): String {
+    if (!language.isNullOrBlank()) {
+        val displayName = runCatching { Locale(language).displayName }.getOrNull()
+        if (!displayName.isNullOrBlank() && !displayName.equals(language, ignoreCase = true)) {
+            return displayName.replaceFirstChar { it.uppercaseChar() }
+        }
+    }
+    if (!rawLabel.isNullOrBlank() && !isLikelyBrandedLabel(rawLabel)) {
+        return rawLabel
+    }
+    return fallback
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,6 +145,8 @@ fun PlayerScreen(
     var zoomMode by remember { mutableStateOf(ZoomMode.FIT) }
     var controlsVisible by remember { mutableStateOf(true) }
 
+    val trackFallbackLabel = stringResource(R.string.player_track_fallback)
+
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
@@ -123,7 +155,11 @@ fun PlayerScreen(
                 tracks.groups.forEach { group ->
                     for (i in 0 until group.length) {
                         val format = group.getTrackFormat(i)
-                        val label = format.label ?: format.language?.uppercase() ?: "Parça ${i + 1}"
+                        val label = cleanTrackLabel(
+                            language = format.language,
+                            rawLabel = format.label,
+                            fallback = trackFallbackLabel.format(i + 1)
+                        )
                         val option = TrackOption(group, i, label, group.isTrackSelected(i))
                         when (group.type) {
                             C.TRACK_TYPE_AUDIO -> audio += option
@@ -224,11 +260,15 @@ fun PlayerScreen(
                 IconButton(onClick = {
                     zoomMode = ZoomMode.values()[(zoomMode.ordinal + 1) % ZoomMode.values().size]
                 }) {
-                    Icon(Icons.Filled.AspectRatio, contentDescription = zoomMode.label, tint = Color.White)
+                    Icon(Icons.Filled.AspectRatio, contentDescription = stringResource(zoomMode.labelRes), tint = Color.White)
                 }
                 if (uiState.playbackUrl != null) {
                     IconButton(onClick = { showTrackDialog = true }) {
-                        Icon(Icons.Filled.Subtitles, contentDescription = "Ses, altyazı ve hız", tint = Color.White)
+                        Icon(
+                            Icons.Filled.Subtitles,
+                            contentDescription = stringResource(R.string.player_settings_content_description),
+                            tint = Color.White
+                        )
                     }
                 }
             }
@@ -283,11 +323,11 @@ private fun TrackSelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Oynatıcı Ayarları") },
+        title = { Text(stringResource(R.string.player_settings_title)) },
         text = {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
-                    Text("Hız", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.player_speed_label), style = MaterialTheme.typography.titleSmall)
                     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                         listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f).forEach { speed ->
                             FilterChip(
@@ -300,7 +340,7 @@ private fun TrackSelectionDialog(
                     }
                 }
                 if (audioTracks.isNotEmpty()) {
-                    item { Text("Ses", style = MaterialTheme.typography.titleSmall) }
+                    item { Text(stringResource(R.string.player_audio_label), style = MaterialTheme.typography.titleSmall) }
                     items(audioTracks) { option ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -312,14 +352,14 @@ private fun TrackSelectionDialog(
                     }
                 }
                 if (subtitleTracks.isNotEmpty()) {
-                    item { Text("Altyazı", style = MaterialTheme.typography.titleSmall) }
+                    item { Text(stringResource(R.string.player_subtitles_label), style = MaterialTheme.typography.titleSmall) }
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(selected = !subtitlesEnabled, onClick = onSubtitlesOff)
-                            Text("Kapalı")
+                            Text(stringResource(R.string.player_subtitles_off))
                         }
                     }
                     items(subtitleTracks) { option ->
@@ -338,7 +378,7 @@ private fun TrackSelectionDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Kapat") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.player_close)) }
         }
     )
 }

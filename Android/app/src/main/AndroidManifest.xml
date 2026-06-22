@@ -26,7 +26,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="xtream.emin.player.fileprovider"
+            android:authorities="com.erdin.player.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

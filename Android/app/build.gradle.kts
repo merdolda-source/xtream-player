@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "xtream.emin.player"
+    namespace = "com.erdin.player"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "xtream.emin.player"
+        applicationId = "com.erdin.player"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

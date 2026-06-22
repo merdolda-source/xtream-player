@@ -8,6 +8,8 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -41,7 +43,9 @@ private val AppShapes = Shapes(
 
 @Composable
 fun XtreamPlayerTheme(content: @Composable () -> Unit) {
-    val colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors
+    val darkOverride by ThemePreferences.darkOverride.collectAsState()
+    val isDark = darkOverride ?: isSystemInDarkTheme()
+    val colorScheme = if (isDark) DarkColors else LightColors
     MaterialTheme(
         colorScheme = colorScheme,
         shapes = AppShapes,

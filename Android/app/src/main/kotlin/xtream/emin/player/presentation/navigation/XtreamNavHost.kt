@@ -2,11 +2,13 @@
 package xtream.emin.player.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import xtream.emin.player.common.ads.InterstitialAdManager
 import xtream.emin.player.domain.entities.Stream
 import xtream.emin.player.domain.entities.StreamType
 import xtream.emin.player.presentation.favorites.FavoritesScreen
@@ -33,6 +35,8 @@ private fun NavHostController.navigateToStream(stream: Stream) {
 
 @Composable
 fun XtreamNavHost(navController: NavHostController, startDestination: String) {
+    val context = LocalContext.current
+
     NavHost(navController = navController, startDestination = startDestination) {
         composable(NavRoutes.LOGIN) {
             LoginScreen(
@@ -46,7 +50,12 @@ fun XtreamNavHost(navController: NavHostController, startDestination: String) {
 
         composable(NavRoutes.HOME) {
             HomeScreen(
-                onStreamClick = { stream -> navController.navigateToStream(stream) },
+                onStreamClick = { stream ->
+                    if (stream.streamType == StreamType.LIVE) {
+                        InterstitialAdManager.onChannelSwitched(context)
+                    }
+                    navController.navigateToStream(stream)
+                },
                 onNavigateToFavorites = { navController.navigate(NavRoutes.FAVORITES) },
                 onNavigateToHistory = { navController.navigate(NavRoutes.HISTORY) },
                 onLoggedOut = {

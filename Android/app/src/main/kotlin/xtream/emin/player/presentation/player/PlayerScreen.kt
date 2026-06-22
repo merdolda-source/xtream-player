@@ -2,6 +2,7 @@
 package xtream.emin.player.presentation.player
 
 import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -143,6 +144,18 @@ fun PlayerScreen(
 
     LaunchedEffect(streamId, streamType) {
         viewModel.loadStream(streamId, streamType, name, containerExtension)
+    }
+
+    // Some users leave system auto-rotate off but still expect the player to
+    // rotate with the phone, like other video apps. Force sensor-based
+    // rotation just for this screen and restore whatever the app had before.
+    DisposableEffect(Unit) {
+        val activity = context as? Activity
+        val previousOrientation = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+        onDispose {
+            activity?.requestedOrientation = previousOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
     }
 
     // Immersive playback: hide system bars for the lifetime of this screen,

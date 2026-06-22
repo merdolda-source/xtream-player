@@ -93,6 +93,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-process:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
 
     // Jetpack Compose
@@ -147,6 +148,9 @@ dependencies {
 
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // AdMob - interstitial (channel-switch), native (in-list), and app-open ads
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
 
     // JSON Serialization
     implementation("com.google.code.gson:gson:2.10.1")

@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,7 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import xtream.emin.player.R
 import xtream.emin.player.domain.entities.Stream
+import xtream.emin.player.presentation.common.NativeAdCard
 import xtream.emin.player.presentation.common.StreamPosterCard
+
+private const val NATIVE_AD_INSERT_INTERVAL = 8
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,13 +70,20 @@ fun FavoritesScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(uiState.favorites, key = { it.streamId }) { stream ->
-                            StreamPosterCard(
-                                stream = stream,
-                                onClick = { onStreamClick(stream) },
-                                isFavorite = true,
-                                onToggleFavorite = { viewModel.removeFavorite(stream) }
-                            )
+                        uiState.favorites.forEachIndexed { index, stream ->
+                            item(key = stream.streamId) {
+                                StreamPosterCard(
+                                    stream = stream,
+                                    onClick = { onStreamClick(stream) },
+                                    isFavorite = true,
+                                    onToggleFavorite = { viewModel.removeFavorite(stream) }
+                                )
+                            }
+                            if (index > 0 && (index + 1) % NATIVE_AD_INSERT_INTERVAL == 0) {
+                                item(key = "ad_$index", span = { GridItemSpan(maxLineSpan) }) {
+                                    NativeAdCard()
+                                }
+                            }
                         }
                     }
                 }

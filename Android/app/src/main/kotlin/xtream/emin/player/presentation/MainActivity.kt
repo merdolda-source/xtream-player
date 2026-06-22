@@ -1,6 +1,7 @@
 // Android/app/src/main/kotlin/com/xtream/player/presentation/MainActivity.kt
 package xtream.emin.player.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import xtream.emin.player.R
+import xtream.emin.player.common.utils.LocaleHelper
+import xtream.emin.player.presentation.common.ThemePreferences
 import xtream.emin.player.presentation.common.XtreamPlayerTheme
 import xtream.emin.player.presentation.navigation.NavRoutes
 import xtream.emin.player.presentation.navigation.XtreamNavHost
@@ -40,9 +43,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        ThemePreferences.init(this)
         splashScreen.setKeepOnScreenCondition { mainViewModel.isLoggedIn.value == null }
         setContent {
             XtreamPlayerTheme {

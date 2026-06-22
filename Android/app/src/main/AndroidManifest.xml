@@ -20,6 +20,10 @@
         android:theme="@style/Theme.XtreamPlayer"
         android:usesCleartextTraffic="true">
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2289573527937577~5012458331" />
+
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

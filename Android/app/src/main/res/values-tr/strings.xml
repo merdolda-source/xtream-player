@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android/app/src/main/res/values-tr/strings.xml -->
 <resources>
-    <string name="app_name">Xtream Player</string>
+    <string name="app_name">EminXtream player</string>
 
     <string name="login_title">Xtream\'e Giriş Yap</string>
     <string name="login_subtitle">Tüm IPTV panelleriniz bir dokunuş ötede</string>
@@ -61,6 +61,7 @@
 
     <string name="series_no_episodes">Bu sezon için bölüm bulunamadı.</string>
 
+    <string name="action_theme">Temayı değiştir</string>
     <string name="action_language">Dili değiştir</string>
     <string name="language_title">Dil</string>
     <string name="language_turkish">Türkçe</string>

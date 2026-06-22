@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android/app/src/main/res/values/strings.xml -->
 <resources>
-    <string name="app_name">Xtream Player</string>
+    <string name="app_name">EminXtream player</string>
 
     <string name="login_title">Sign in to Xtream</string>
     <string name="login_subtitle">Your IPTV panels, one tap away</string>
@@ -61,6 +61,7 @@
 
     <string name="series_no_episodes">No episodes for this season.</string>
 
+    <string name="action_theme">Switch theme</string>
     <string name="action_language">Change language</string>
     <string name="language_title">Language</string>
     <string name="language_turkish">Türkçe</string>

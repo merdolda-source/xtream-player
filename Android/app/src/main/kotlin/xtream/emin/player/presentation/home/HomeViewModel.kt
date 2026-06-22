@@ -27,13 +27,18 @@ import javax.inject.Inject
 
 enum class HomeTab { LIVE, VOD, SERIES }
 
+/** First browse by category (list), then drill into that category's streams (cards). */
+enum class HomeViewMode { CATEGORIES, STREAMS }
+
 data class HomeUiState(
     val selectedTab: HomeTab = HomeTab.LIVE,
+    val viewMode: HomeViewMode = HomeViewMode.CATEGORIES,
     val liveStreams: List<Stream> = emptyList(),
     val vodStreams: List<Stream> = emptyList(),
     val seriesStreams: List<Stream> = emptyList(),
     val categories: List<Category> = emptyList(),
     val selectedCategoryId: String? = null,
+    val selectedCategoryName: String? = null,
     val favoriteIds: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -63,7 +68,7 @@ class HomeViewModel @Inject constructor(
     init {
         loadFavoriteIds()
         loadAccountInfo()
-        loadTab(HomeTab.LIVE)
+        loadCategories(HomeTab.LIVE)
     }
 
     private fun loadAccountInfo() {
@@ -76,13 +81,32 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectTab(tab: HomeTab) {
-        _uiState.update { it.copy(selectedTab = tab, selectedCategoryId = null) }
-        loadTab(tab)
+        _uiState.update {
+            it.copy(
+                selectedTab = tab,
+                viewMode = HomeViewMode.CATEGORIES,
+                selectedCategoryId = null,
+                selectedCategoryName = null
+            )
+        }
+        loadCategories(tab)
     }
 
-    fun selectCategory(categoryId: String?) {
-        _uiState.update { it.copy(selectedCategoryId = categoryId) }
-        loadTab(_uiState.value.selectedTab, categoryId = categoryId)
+    /** Drill into a category (or "All" when [categoryId] is null) and load its streams. */
+    fun selectCategory(categoryId: String?, categoryName: String?) {
+        _uiState.update {
+            it.copy(
+                viewMode = HomeViewMode.STREAMS,
+                selectedCategoryId = categoryId,
+                selectedCategoryName = categoryName
+            )
+        }
+        loadStreams(_uiState.value.selectedTab, categoryId)
+    }
+
+    /** Back out of the stream grid to the category list for the current tab. */
+    fun backToCategories() {
+        _uiState.update { it.copy(viewMode = HomeViewMode.CATEGORIES) }
     }
 
     fun toggleFavorite(stream: Stream) {
@@ -123,7 +147,31 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadTab(tab: HomeTab, categoryId: String? = null) {
+    private fun loadCategories(tab: HomeTab) {
+        viewModelScope.launch {
+            val user = authRepository.getCurrentSession()
+            if (user == null) {
+                _uiState.update { it.copy(errorMessage = "Not logged in.") }
+                return@launch
+            }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                val categories = when (tab) {
+                    HomeTab.LIVE -> getLiveCategoriesUseCase(user.host, user.username, user.password)
+                    HomeTab.VOD -> getVodCategoriesUseCase(user.host, user.username, user.password)
+                    HomeTab.SERIES -> getSeriesCategoriesUseCase(user.host, user.username, user.password)
+                }
+                _uiState.update { it.copy(categories = categories, isLoading = false) }
+            } catch (e: Exception) {
+                Logger.error("Failed to load $tab categories", e)
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = e.message ?: "Failed to load content.")
+                }
+            }
+        }
+    }
+
+    private fun loadStreams(tab: HomeTab, categoryId: String?) {
         viewModelScope.launch {
             val user = authRepository.getCurrentSession()
             if (user == null) {
@@ -134,29 +182,20 @@ class HomeViewModel @Inject constructor(
             try {
                 when (tab) {
                     HomeTab.LIVE -> {
-                        val categories = getLiveCategoriesUseCase(user.host, user.username, user.password)
                         val streams = getLiveStreamsUseCase(user.host, user.username, user.password, categoryId)
-                        _uiState.update {
-                            it.copy(liveStreams = streams, categories = categories, isLoading = false)
-                        }
+                        _uiState.update { it.copy(liveStreams = streams, isLoading = false) }
                     }
                     HomeTab.VOD -> {
-                        val categories = getVodCategoriesUseCase(user.host, user.username, user.password)
                         val streams = getVODStreamsUseCase(user.host, user.username, user.password, categoryId)
-                        _uiState.update {
-                            it.copy(vodStreams = streams, categories = categories, isLoading = false)
-                        }
+                        _uiState.update { it.copy(vodStreams = streams, isLoading = false) }
                     }
                     HomeTab.SERIES -> {
-                        val categories = getSeriesCategoriesUseCase(user.host, user.username, user.password)
                         val streams = getSeriesUseCase(user.host, user.username, user.password, categoryId)
-                        _uiState.update {
-                            it.copy(seriesStreams = streams, categories = categories, isLoading = false)
-                        }
+                        _uiState.update { it.copy(seriesStreams = streams, isLoading = false) }
                     }
                 }
             } catch (e: Exception) {
-                Logger.error("Failed to load $tab", e)
+                Logger.error("Failed to load $tab streams", e)
                 _uiState.update {
                     it.copy(isLoading = false, errorMessage = e.message ?: "Failed to load content.")
                 }

@@ -22,6 +22,7 @@ object CurrentActivityTracker {
         application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityResumed(activity: Activity) {
                 currentActivityRef = WeakReference(activity)
+                AppOpenAdManager.onActivityResumed()
             }
 
             override fun onActivityPaused(activity: Activity) {

@@ -2,8 +2,6 @@
 package xtream.emin.player.common.ads
 
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -15,8 +13,13 @@ import xtream.emin.player.common.utils.Logger
  * Shows an app-open ad whenever the app returns to the foreground (e.g. the
  * user leaves and re-enters), skipping only the very first cold launch so it
  * doesn't collide with the branded splash screen.
+ *
+ * Driven directly from CurrentActivityTracker's onActivityResumed rather than
+ * ProcessLifecycleOwner: the latter's onStart fires before the Activity's own
+ * onResume, so currentActivity would still be null at the moment this needs
+ * it, on both cold start and background-return.
  */
-object AppOpenAdManager : DefaultLifecycleObserver {
+object AppOpenAdManager {
     private var appOpenAd: AppOpenAd? = null
     private var isLoading = false
     private var isShowingAd = false
@@ -43,7 +46,7 @@ object AppOpenAdManager : DefaultLifecycleObserver {
         )
     }
 
-    override fun onStart(owner: LifecycleOwner) {
+    fun onActivityResumed() {
         if (isColdStart) {
             isColdStart = false
             preload(CurrentActivityTracker.currentActivity?.applicationContext ?: return)

@@ -60,15 +60,13 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
 
-            // Google's published sample ad units always have fill, unlike a
-            // brand-new real ad unit awaiting AdMob approval. Using them in
-            // debug also avoids accidentally generating invalid traffic by
-            // tapping our own real ads while testing.
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
-            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
+            // Real AdMob IDs, same as release - requested explicitly after
+            // verifying the integration against Google's test ad units.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-2289573527937577~5012458331"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-2289573527937577~5012458331\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/1957336650\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/5777428099\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/3851092581\"")
         }
     }
 
@@ -111,7 +109,6 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-process:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
 
     // Jetpack Compose

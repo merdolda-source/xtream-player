@@ -2,10 +2,8 @@
 package xtream.emin.player
 
 import android.app.Application
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
-import xtream.emin.player.common.ads.AppOpenAdManager
 import xtream.emin.player.common.ads.CurrentActivityTracker
 import xtream.emin.player.common.utils.Logger
 
@@ -20,6 +18,5 @@ class XtreamPlayerApplication : Application() {
 
         CurrentActivityTracker.register(this)
         MobileAds.initialize(this)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(AppOpenAdManager)
     }
 }

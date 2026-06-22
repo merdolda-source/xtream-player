@@ -3,16 +3,14 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
 }
 
 android {
-    namespace = "com.xtream.player"
+    namespace = "xtream.emin.player"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.xtream.player"
+        applicationId = "xtream.emin.player"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -22,11 +20,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        // Sourced into AndroidManifest.xml's AdMob APPLICATION_ID meta-data tag.
-        // Mirrors the per-buildtype BuildConfig.ADMOB_APP_ID value below.
-        // TODO: replace with the real AdMob app id before release.
-        manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
     }
 
     // Signing Configuration for Release APK
@@ -51,18 +44,29 @@ android {
             }
 
             buildConfigField("String", "API_BASE_URL", "\"https://xtream-player.com/api/\"")
-            // TODO: replace with the real AdMob app id before release. Using Google's
-            // public test app id keeps debug/release builds runnable without crashing.
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "false")
+
+            // Real AdMob IDs for this app's own account - only ship these in
+            // the signed release build that goes to the Play Store.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-2289573527937577~5012458331"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-2289573527937577~5012458331\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/1957336650\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/5777428099\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/3851092581\"")
         }
 
         debug {
             isDebuggable = true
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
-            // Google's official public test AdMob app id - safe for non-production builds.
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
+
+            // Real AdMob IDs, same as release - requested explicitly after
+            // verifying the integration against Google's test ad units.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-2289573527937577~5012458331"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-2289573527937577~5012458331\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/1957336650\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/5777428099\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/3851092581\"")
         }
     }
 
@@ -102,6 +106,8 @@ android {
 dependencies {
     // AndroidX & Core
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.0")
 
@@ -114,6 +120,12 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.0")
+
+    // Material Icons (extended set: PlayCircle, Subtitles, Favorite, History, etc.)
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+
+    // Image loading for stream/series posters and episode thumbnails
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
@@ -141,20 +153,19 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // Media3/ExoPlayer
+    // Media3/ExoPlayer - hls/dash extras widen format support beyond plain
+    // progressive mp4/mkv (Xtream live channels are commonly HLS or DASH).
     implementation("androidx.media3:media3-exoplayer:1.1.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.1.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.1.0")
     implementation("androidx.media3:media3-ui:1.1.0")
     implementation("androidx.media3:media3-session:1.1.0")
 
-    // Firebase
-    implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
-
-    // Google Mobile Ads
-    implementation("com.google.android.gms:play-services-ads:22.6.0")
-
     // Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // AdMob - interstitial (channel-switch), native (in-list), and app-open ads
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
 
     // JSON Serialization
     implementation("com.google.code.gson:gson:2.10.1")

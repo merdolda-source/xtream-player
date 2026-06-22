@@ -5,24 +5,21 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
     <application
         android:name=".XtreamPlayerApplication"
         android:allowBackup="true"
+        android:banner="@drawable/tv_banner"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher"
+        android:localeConfig="@xml/locales_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.XtreamPlayer"
         android:usesCleartextTraffic="true">
 
-        <!--
-            AdMob application id. Sourced from the manifestPlaceholders["admobAppId"]
-            entry in app/build.gradle.kts (currently Google's official PUBLIC TEST id
-            ca-app-pub-3940256099942544~3347511713).
-            TODO: MUST be replaced with a real AdMob app id before release - the test
-            id is safe to ship in debug but will not serve real ads / will violate
-            AdMob policy in production.
-        -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
@@ -30,11 +27,13 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.XtreamPlayer"
-            android:screenOrientation="unspecified">
+            android:theme="@style/Theme.XtreamPlayer.Starting"
+            android:screenOrientation="unspecified"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

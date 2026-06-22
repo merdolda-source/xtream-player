@@ -62,6 +62,7 @@
     <string name="series_no_episodes">No episodes for this season.</string>
 
     <string name="action_theme">Switch theme</string>
+    <string name="action_share_logs">Share debug logs</string>
     <string name="action_language">Change language</string>
     <string name="language_title">Language</string>
     <string name="language_turkish">Türkçe</string>

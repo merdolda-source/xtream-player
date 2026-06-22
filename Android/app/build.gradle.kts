@@ -45,12 +45,30 @@ android {
 
             buildConfigField("String", "API_BASE_URL", "\"https://xtream-player.com/api/\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "false")
+
+            // Real AdMob IDs for this app's own account - only ship these in
+            // the signed release build that goes to the Play Store.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-2289573527937577~5012458331"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-2289573527937577~5012458331\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/1957336650\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/5777428099\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-2289573527937577/3851092581\"")
         }
 
         debug {
             isDebuggable = true
             buildConfigField("String", "API_BASE_URL", "\"http://localhost:8000/api/\"")
             buildConfigField("Boolean", "DEBUG_LOGS", "true")
+
+            // Google's published sample ad units always have fill, unlike a
+            // brand-new real ad unit awaiting AdMob approval. Using them in
+            // debug also avoids accidentally generating invalid traffic by
+            // tapping our own real ads while testing.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
         }
     }
 

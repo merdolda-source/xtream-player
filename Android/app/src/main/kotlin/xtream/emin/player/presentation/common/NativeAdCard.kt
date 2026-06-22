@@ -23,11 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import xtream.emin.player.common.ads.AdConfig
+import xtream.emin.player.common.utils.Logger
 
 private class NativeAdChildViews(
     val adView: NativeAdView,
@@ -47,6 +50,11 @@ fun NativeAdCard(modifier: Modifier = Modifier) {
     DisposableEffect(Unit) {
         val loader = AdLoader.Builder(context, AdConfig.NATIVE_AD_UNIT_ID)
             .forNativeAd { ad -> nativeAd = ad }
+            .withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Logger.error("Native ad failed to load: ${error.message}")
+                }
+            })
             .build()
         loader.loadAd(AdRequest.Builder().build())
         onDispose { nativeAd?.destroy() }

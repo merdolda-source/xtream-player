@@ -1,6 +1,7 @@
 // Android/app/src/main/kotlin/com/xtream/player/presentation/login/LoginScreen.kt
 package xtream.emin.player.presentation.login
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,10 @@ fun LoginScreen(
         if (uiState.loginSucceeded) {
             onLoginSuccess()
         }
+    }
+
+    BackHandler(enabled = uiState.showAddForm && uiState.savedAccounts.isNotEmpty()) {
+        viewModel.cancelAddAccountForm()
     }
 
     Box(

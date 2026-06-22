@@ -8,7 +8,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Forward10
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +33,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,6 +59,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -62,6 +73,7 @@ import kotlinx.coroutines.delay
 import xtream.emin.player.R
 import xtream.emin.player.domain.entities.StreamType
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 private data class TrackOption(
     val group: Tracks.Group,
@@ -101,6 +113,18 @@ private fun cleanTrackLabel(
         return rawLabel
     }
     return fallback
+}
+
+private fun formatPlaybackTime(ms: Long): String {
+    val totalSeconds = TimeUnit.MILLISECONDS.toSeconds(ms.coerceAtLeast(0))
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return if (hours > 0) {
+        String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format(Locale.getDefault(), "%d:%02d", minutes, seconds)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,6 +168,13 @@ fun PlayerScreen(
     var showTrackDialog by remember { mutableStateOf(false) }
     var zoomMode by remember { mutableStateOf(ZoomMode.FIT) }
     var controlsVisible by remember { mutableStateOf(true) }
+    var isPlaying by remember { mutableStateOf(true) }
+    var userPaused by remember { mutableStateOf(false) }
+    var wasPlayingBeforeBackground by remember { mutableStateOf(false) }
+    var currentPositionMs by remember { mutableStateOf(0L) }
+    var durationMs by remember { mutableStateOf(0L) }
+    var isSeeking by remember { mutableStateOf(false) }
+    val showSeekControls = streamType != StreamType.LIVE
 
     val trackFallbackLabel = stringResource(R.string.player_track_fallback)
 
@@ -171,6 +202,10 @@ fun PlayerScreen(
                 audioTracks = audio
                 subtitleTracks = subs
             }
+
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying = playing
+            }
         }
         exoPlayer.addListener(listener)
         onDispose {
@@ -179,12 +214,46 @@ fun PlayerScreen(
         }
     }
 
+    // Pause playback when the app is backgrounded (Home/Recents/screen off)
+    // so audio doesn't keep streaming after the user leaves the app, and
+    // resume only if the user hadn't explicitly paused it themselves.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(exoPlayer, lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    wasPlayingBeforeBackground = exoPlayer.isPlaying
+                    exoPlayer.pause()
+                }
+                Lifecycle.Event.ON_START -> {
+                    if (wasPlayingBeforeBackground && !userPaused) {
+                        exoPlayer.play()
+                    }
+                }
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     LaunchedEffect(uiState.playbackUrl) {
         uiState.playbackUrl?.let { url ->
             val mediaItem = MediaItem.fromUri(Uri.parse(url))
             exoPlayer.setMediaItem(mediaItem)
             exoPlayer.prepare()
             exoPlayer.playWhenReady = true
+        }
+    }
+
+    LaunchedEffect(exoPlayer, uiState.playbackUrl) {
+        while (true) {
+            if (!isSeeking) {
+                val duration = exoPlayer.duration
+                durationMs = if (duration > 0) duration else 0L
+                currentPositionMs = exoPlayer.currentPosition.coerceAtLeast(0L)
+            }
+            delay(500)
         }
     }
 
@@ -269,6 +338,105 @@ fun PlayerScreen(
                             contentDescription = stringResource(R.string.player_settings_content_description),
                             tint = Color.White
                         )
+                    }
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = controlsVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f))
+                        )
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                if (showSeekControls && durationMs > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = formatPlaybackTime(currentPositionMs),
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        Slider(
+                            value = currentPositionMs.toFloat().coerceIn(0f, durationMs.toFloat()),
+                            onValueChange = {
+                                isSeeking = true
+                                currentPositionMs = it.toLong()
+                            },
+                            onValueChangeFinished = {
+                                exoPlayer.seekTo(currentPositionMs)
+                                isSeeking = false
+                            },
+                            valueRange = 0f..durationMs.toFloat(),
+                            colors = SliderDefaults.colors(
+                                thumbColor = MaterialTheme.colorScheme.primary,
+                                activeTrackColor = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                        )
+                        Text(
+                            text = formatPlaybackTime(durationMs),
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (showSeekControls) {
+                        IconButton(onClick = {
+                            exoPlayer.seekTo((exoPlayer.currentPosition - 15_000).coerceAtLeast(0))
+                        }) {
+                            Icon(
+                                Icons.Filled.Replay10,
+                                contentDescription = stringResource(R.string.player_rewind),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                    IconButton(onClick = {
+                        if (exoPlayer.isPlaying) {
+                            userPaused = true
+                            exoPlayer.pause()
+                        } else {
+                            userPaused = false
+                            exoPlayer.play()
+                        }
+                    }) {
+                        Icon(
+                            if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = stringResource(
+                                if (isPlaying) R.string.player_pause else R.string.player_play
+                            ),
+                            tint = Color.White
+                        )
+                    }
+                    if (showSeekControls) {
+                        IconButton(onClick = {
+                            val target = (exoPlayer.currentPosition + 15_000).let { target ->
+                                if (durationMs > 0) target.coerceAtMost(durationMs) else target
+                            }
+                            exoPlayer.seekTo(target)
+                        }) {
+                            Icon(
+                                Icons.Filled.Forward10,
+                                contentDescription = stringResource(R.string.player_forward),
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
             }

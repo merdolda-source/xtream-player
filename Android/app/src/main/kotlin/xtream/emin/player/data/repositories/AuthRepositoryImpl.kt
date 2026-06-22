@@ -4,6 +4,7 @@ package xtream.emin.player.data.repositories
 import xtream.emin.player.data.remote.api.XtreamApiService
 import xtream.emin.player.data.remote.api.XtreamUrlBuilder
 import xtream.emin.player.data.session.SessionManager
+import xtream.emin.player.domain.entities.Account
 import xtream.emin.player.domain.entities.User
 import xtream.emin.player.domain.repositories.AuthRepository
 import javax.inject.Inject
@@ -13,7 +14,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val sessionManager: SessionManager
 ) : AuthRepository {
 
-    override suspend fun login(host: String, username: String, password: String): Result<User> {
+    override suspend fun login(host: String, username: String, password: String, profileName: String): Result<User> {
         return try {
             val response = apiService.login(XtreamUrlBuilder.playerApiUrl(host), username, password)
             val userInfo = response.userInfo
@@ -24,18 +25,22 @@ class AuthRepositoryImpl @Inject constructor(
                     host = host,
                     username = username,
                     password = password,
+                    profileName = profileName,
                     status = userInfo.status,
                     expDate = userInfo.expDate,
                     isTrial = userInfo.isTrial == "1",
                     maxConnections = userInfo.maxConnections
                 )
-                sessionManager.saveSession(user)
+                sessionManager.saveSession(user, profileName)
                 Result.success(user)
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+    override suspend fun loginWithAccount(account: Account): Result<User> =
+        login(account.host, account.username, account.password, account.profileName)
 
     override suspend fun logout() {
         sessionManager.clearSession()
@@ -44,4 +49,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getCurrentSession(): User? = sessionManager.getSession()
 
     override suspend fun isLoggedIn(): Boolean = sessionManager.getSession() != null
+
+    override suspend fun getSavedAccounts(): List<Account> = sessionManager.getAccounts()
+
+    override suspend fun deleteAccount(accountId: String) = sessionManager.deleteAccount(accountId)
 }

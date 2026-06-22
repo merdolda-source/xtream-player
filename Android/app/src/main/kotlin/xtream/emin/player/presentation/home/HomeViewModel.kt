@@ -3,6 +3,7 @@ package xtream.emin.player.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import xtream.emin.player.common.utils.ExpiryFormatter
 import xtream.emin.player.common.utils.Logger
 import xtream.emin.player.domain.entities.Category
 import xtream.emin.player.domain.entities.Stream
@@ -37,7 +38,9 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val searchQuery: String = "",
-    val searchResults: List<Stream>? = null
+    val searchResults: List<Stream>? = null,
+    val accountExpiry: String? = null,
+    val accountIsTrial: Boolean = false
 )
 
 @HiltViewModel
@@ -59,7 +62,17 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadFavoriteIds()
+        loadAccountInfo()
         loadTab(HomeTab.LIVE)
+    }
+
+    private fun loadAccountInfo() {
+        viewModelScope.launch {
+            val user = authRepository.getCurrentSession() ?: return@launch
+            _uiState.update {
+                it.copy(accountExpiry = ExpiryFormatter.format(user.expDate), accountIsTrial = user.isTrial)
+            }
+        }
     }
 
     fun selectTab(tab: HomeTab) {

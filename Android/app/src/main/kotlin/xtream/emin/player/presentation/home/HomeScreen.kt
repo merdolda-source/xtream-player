@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -39,8 +40,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import android.app.Activity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,7 +69,24 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringRes(R.string.app_name)) },
+                title = {
+                    Column {
+                        Text(stringRes(R.string.app_name))
+                        if (uiState.accountIsTrial) {
+                            Text(
+                                text = stringRes(R.string.login_trial_badge),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        } else {
+                            uiState.accountExpiry?.let { expiry ->
+                                Text(
+                                    text = stringRes(R.string.login_expires_label).format(expiry),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
+                },
                 actions = {
                     LanguageSwitcher()
                     IconButton(onClick = onNavigateToFavorites) {
@@ -236,6 +256,7 @@ private fun StreamGridView(
 @Composable
 private fun LanguageSwitcher() {
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Box {
         IconButton(onClick = { expanded = true }) {
             Icon(Icons.Filled.Language, contentDescription = stringRes(R.string.action_language))
@@ -245,22 +266,26 @@ private fun LanguageSwitcher() {
                 text = { Text(stringRes(R.string.language_turkish)) },
                 onClick = {
                     expanded = false
-                    setAppLocale("tr")
+                    setAppLocale(context, "tr")
                 }
             )
             DropdownMenuItem(
                 text = { Text(stringRes(R.string.language_english)) },
                 onClick = {
                     expanded = false
-                    setAppLocale("en")
+                    setAppLocale(context, "en")
                 }
             )
         }
     }
 }
 
-private fun setAppLocale(languageTag: String) {
+// AppCompatDelegate persists the locale, but only auto-recreates
+// AppCompatActivity subclasses - MainActivity is a plain ComponentActivity,
+// so the Activity must be recreated manually for the change to show.
+private fun setAppLocale(context: android.content.Context, languageTag: String) {
     AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
+    (context as? Activity)?.recreate()
 }
 
 @Composable

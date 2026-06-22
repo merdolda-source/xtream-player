@@ -11,6 +11,7 @@ data class User(
     val host: String,
     val username: String,
     val password: String,
+    val profileName: String? = null,
     val status: String? = null,
     val expDate: String? = null,
     val isTrial: Boolean = false,

@@ -4,12 +4,22 @@
     <string name="app_name">Xtream Player</string>
 
     <string name="login_title">Xtream\'e Giriş Yap</string>
+    <string name="login_subtitle">Tüm IPTV panelleriniz bir dokunuş ötede</string>
+    <string name="login_profile_name_label">Profil adı</string>
     <string name="login_host_label">Sunucu adresi (örn. http://example.com:8080)</string>
     <string name="login_username_label">Kullanıcı Adı</string>
     <string name="login_password_label">Şifre</string>
     <string name="login_button">Giriş Yap</string>
     <string name="login_error_generic">Giriş başarısız. Bilgilerinizi kontrol edip tekrar deneyin.</string>
     <string name="login_error_empty_fields">Lütfen tüm alanları doldurun.</string>
+    <string name="login_profiles_title">Profiller</string>
+    <string name="login_add_profile">Profil ekle</string>
+    <string name="login_new_profile_title">Yeni profil</string>
+    <string name="login_cancel">Vazgeç</string>
+    <string name="login_delete_profile">Profili sil</string>
+    <string name="login_expires_label">Bitiş %1$s</string>
+    <string name="login_unlimited">Sınırsız</string>
+    <string name="login_trial_badge">Deneme</string>
 
     <string name="tab_live">Canlı TV</string>
     <string name="tab_vod">Filmler</string>
@@ -44,6 +54,10 @@
     <string name="player_zoom_fill">Doldur</string>
     <string name="player_zoom_zoom">Yakınlaştır</string>
     <string name="player_minutes_suffix">%1$d dk</string>
+    <string name="player_play">Oynat</string>
+    <string name="player_pause">Duraklat</string>
+    <string name="player_rewind">15 saniye geri sar</string>
+    <string name="player_forward">15 saniye ileri sar</string>
 
     <string name="series_no_episodes">Bu sezon için bölüm bulunamadı.</string>
 
